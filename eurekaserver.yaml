@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eurekaserver
+  labels:
+    app: eurekaserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eurekaserver
+  template:
+    metadata: 
+      labels:
+        app: eurekaserver
+    spec: 
+      containers:
+        - name: eurekaserver
+          image: robindocker/microservice_eurekaserver:1.0.0
+          ports:
+          - containerPort: 8070
+          env:
+          - name: SPRING_PROFILES_ACTIVE
+            valueFrom:
+              configMapKeyRef: 
+                name: microservicios-configmap
+                key: spring_profiles_active
+          - name: SPRING_CONFIG_IMPORT
+            valueFrom:
+              configMapKeyRef: 
+                name: microservicios-configmap
+                key: spring_config_config_import  
+                 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eurekaserver-service
+spec:
+  selector:
+    app: eurekaserver
+  ports:
+    - protocol: TCP
+      port: 8070
+      targetPort: 8070
